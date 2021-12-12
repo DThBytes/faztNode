@@ -3,6 +3,7 @@ const path = require('path');
 const exphbs = require('express-handlebars');
 const methodOverride = require('method-override');
 const session = require('express-session');
+const flash = require('connect-flash');
 
 //Initiliazations
 const app = express();
@@ -20,14 +21,20 @@ app.engine('.hbs', exphbs.engine({
 app.set('view engine', '.hbs');
 //Middlewares
 app.use(express.urlencoded({extended: false}));
-app.use(methodOverride('method'));
+app.use(methodOverride('_method'));
 app.use(session({
     secret: 'mysecretapp',
     resave: true,
     saveUninitialized: true
 }));
+app.use(flash());
 //Global Variables
+app.use((req, res, next)=>{
+    res.locals.success_msg = req.flash('success_msg');
+    res.locals.error_msg = req.flash('error_msg');
 
+    next();
+});
 //Routes
 app.use(require('./routes/index'));
 app.use(require('./routes/notes'));
